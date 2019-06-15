@@ -1,8 +1,37 @@
 <template>
   <div>
-    <!-- Must be wrapped in a root element to display HTML -->
     <div class="home">
-      <h1>{{ title }}</h1>
+      <button
+        class="btn btn-primary"
+        type="button"
+        data-toggle="collapse"
+        v-bind:data-target="`#` + toggle"
+        aria-expanded="false"
+        aria-controls="collapseExample"
+        @click="clearLinks()"
+      >
+        {{ title }}
+      </button>
+
+      <div class="collapse" v-bind:id="toggle">
+        <div class="card card-body">
+          <button class="btn btn-primary" v-for="streamPost in streamPosts">
+            <a @click="scrapeInfoFromStreamPost(streamPost.data.url)">{{
+              streamPost.data.title
+            }}</a>
+          </button>
+        </div>
+      </div>
+
+      <ol v-if="click === true">
+        <li v-for="link in links">
+          <a v-bind:href="link" target="_blank"> {{ link }}</a>
+        </li>
+      </ol>
+
+      <!-- Must be wrapped in a root element to display HTML -->
+
+      <!--       <h1>{{ title }}</h1>
       <ul>
         <li v-for="streamPost in streamPosts">
           <a @click="scrapeInfoFromStreamPost(streamPost.data.url)">{{
@@ -16,6 +45,7 @@
           <a v-bind:href="link" target="_blank"> {{ link }}</a>
         </li>
       </ol>
+    </div> -->
     </div>
   </div>
 </template>
@@ -24,7 +54,7 @@
 import axios from "axios";
 
 export default {
-  props: ["link", "title"],
+  props: ["link", "title", "toggle"],
 
   data() {
     return {
@@ -62,7 +92,8 @@ export default {
     // });
   },
 
-  methods: {//Getters
+  methods: {
+    //Getters
     //--------------------------------------------------------
     getURLs: function(streamPosts) {
       this.streamURLs = streamPosts.map(streamPost => {
@@ -72,7 +103,6 @@ export default {
 
     // Collects body of each top-level comment where stream link is stored
     getStreamsFromPost: function(fromPostStreams) {
-
       // Regex to collect links for top level comments on stream posts
       const linkCheck = /href=(["'])(.*?)\1/gm;
 
@@ -130,11 +160,18 @@ export default {
     },
 
     filterLinks: function(link) {
-      if (link.includes("http") && !(link.includes("discord")) && !(link.includes("reddit"))) {
+      if (
+        link.includes("http") &&
+        !link.includes("discord") &&
+        !link.includes("reddit")
+      ) {
         return true;
       }
-    }
+    },
 
+    clearLinks: function() {
+      this.links = [];
+    }
   }
 };
 </script>

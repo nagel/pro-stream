@@ -3,10 +3,12 @@
   <StreamSub
     title="MLB Streams"
     link="https://www.reddit.com/r/mlbstreams/.json"
+    toggle="collapseMLB"
   ></StreamSub>
   <StreamSub
     title="NBA Streams"
     link="https://www.reddit.com/r/nbastreams/.json"
+    toggle="collapseNBA"
   ></StreamSub>
 </div>
 </template>
