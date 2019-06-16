@@ -15,45 +15,31 @@
 
       <div class="collapse" v-bind:id="toggle">
         <div class="card card-body">
-          <button class="btn btn-primary" v-for="streamPost in streamPosts">
-            <a @click="scrapeInfoFromStreamPost(streamPost.data.url)">{{
-              streamPost.data.title
-            }}</a>
-          </button>
+          <div v-for="streamPost in streamPosts">
+            <button class="btn btn-primary">
+              <a @click="scrapeInfoFromStreamPost(streamPost.data.url)">{{
+                streamPost.data.title
+              }}</a>
+            </button>
+            <div v-if="click">
+              <GameLink v-bind:links="links"></GameLink>
+            </div>
+          </div>
         </div>
       </div>
-
-      <ol v-if="click === true">
-        <li v-for="link in links">
-          <a v-bind:href="link" target="_blank"> {{ link }}</a>
-        </li>
-      </ol>
-
-      <!-- Must be wrapped in a root element to display HTML -->
-
-      <!--       <h1>{{ title }}</h1>
-      <ul>
-        <li v-for="streamPost in streamPosts">
-          <a @click="scrapeInfoFromStreamPost(streamPost.data.url)">{{
-            streamPost.data.title
-          }}</a>
-        </li>
-      </ul>
-
-      <ol v-if="click === true">
-        <li v-for="link in links">
-          <a v-bind:href="link" target="_blank"> {{ link }}</a>
-        </li>
-      </ol>
-    </div> -->
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import GameLink from "@/components/GameLink.vue";
 
 export default {
+  components: {
+    GameLink
+  },
+
   props: ["link", "title", "toggle"],
 
   data() {
@@ -78,10 +64,11 @@ export default {
 
       // Filters out streamPosts that do not contain 'Game'
       this.streamPosts = this.streamPosts.filter(post => {
+        console.log(this.streamPosts);
         return post.data.title.includes("Game");
       });
 
-      console.log(this.streamPosts);
+      // console.log(this.streamPosts);
 
       // Gets individual post URLs and used to access comments containg stream links
       this.getURLs(this.streamPosts);
@@ -121,7 +108,7 @@ export default {
       // Filters link array of any discord or internal reddit links
       this.links = this.links.filter(this.filterLinks);
 
-      console.log(this.links);
+      // console.log(this.links);
 
       // All top comment level information into comments object
       this.comments = fromPostStreams.map(fromPostStream => {
@@ -134,21 +121,14 @@ export default {
     //Post Scrapers
     //--------------------------------------------------------
     scrapeInfoFromStreamPost: function(URL) {
-      console.log(URL);
+      // console.log(URL);
 
       this.click = false;
 
       axios.get(URL + `.json`).then(response => {
-        // JSON responses are automatically parsed.
-
-        // kind="t1" is a top level comment
-        // data.body is the comment text
-        // data.ups is upvotes
-
-        // gets body text of one top comment
-        // console.log(response.data[1].data.children[0].data.body);
-
         this.click = true;
+
+        // console.log(this.click);
 
         // Collects body of each top-level comment where stream link is stored
         this.getStreamsFromPost(response.data[1].data.children);
